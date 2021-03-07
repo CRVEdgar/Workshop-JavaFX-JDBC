@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -26,8 +27,12 @@ public class FXMain extends Application {
     public void start(Stage primaryStage) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainView.fxml"));
-            Parent parent = loader.load();
-            Scene mainScene = new Scene(parent);
+            ScrollPane scrollpane = loader.load();
+            
+            scrollpane.setFitToHeight(true);//comando para ajustar[REDIMENSINAR] altura do menu ao tamanho da tela(scrollpane)
+            scrollpane.setFitToWidth(true);//comando para ajustar[REDIMENSINAR] largura do menu ao tamanho da tela(scrollpane)
+            
+            Scene mainScene = new Scene(scrollpane);
             primaryStage.setScene(mainScene);
             primaryStage.setTitle("Sample JavaFX application");
             primaryStage.show();
