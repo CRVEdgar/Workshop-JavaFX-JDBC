@@ -23,16 +23,22 @@ import javafx.stage.Stage;
  */
 public class FXMain extends Application {
     
+    private static Scene mainScene;
+    
+    public static Scene getMainScene(){
+        return mainScene;
+    }
+    
     @Override
     public void start(Stage primaryStage) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainView.fxml")); //instanciando uma tela
             ScrollPane scrollpane = loader.load();
             
             scrollpane.setFitToHeight(true);//comando para ajustar[REDIMENSINAR] altura do menu ao tamanho da tela(scrollpane)
             scrollpane.setFitToWidth(true);//comando para ajustar[REDIMENSINAR] largura do menu ao tamanho da tela(scrollpane)
             
-            Scene mainScene = new Scene(scrollpane);
+            mainScene = new Scene(scrollpane);
             primaryStage.setScene(mainScene);
             primaryStage.setTitle("Sample JavaFX application");
             primaryStage.show();
