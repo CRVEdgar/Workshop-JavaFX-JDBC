@@ -1,0 +1,30 @@
+/*
+EXCECAO PARA VALIDAR UM FORMULARIO
+ */
+package model.exception;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ *
+ * @author Edgar
+ */
+public class ValidationException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+    
+    private Map<String, String> erros = new HashMap<>();
+    
+    public ValidationException(String msg){
+        super(msg);
+    }
+    
+    public Map<String, String> getErros(){
+        return erros;
+    }
+    
+    public void addError(String fieldName, String erroMessage){
+        erros.put(fieldName, erroMessage);
+    }
+    
+}

@@ -13,7 +13,9 @@ import gui.util.Utils;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -22,6 +24,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Departament;
+import model.exception.ValidationException;
 import model.services.DepartmentService;
 
 /**
@@ -87,17 +90,37 @@ public class DepartmentFormController implements Initializable {
             notifyDataChangeListeners(); //VIDEO 284 - notifica quando ocorrer uma alteracao
             Utils.currentStage(evento).close();//pega a referencia da janela atual e fecha
             Alerts.showAlert("Adicionando Departamento", null, "Departamento Adicionado com sucesso", AlertType.INFORMATION);
-        }catch(DbException e){
+        }catch(ValidationException e){
+            setErrorMessages(e.getErros());
+        }
+        catch(DbException e){
             Alerts.showAlert("Erro ao salvar no Banco de dados", null, e.getMessage(), AlertType.ERROR);
         }
     }
     private Departament getFormData(){ //metodo que captura o que eh digitado nos campos do formulario da view[departmentForm]
         Departament obj = new Departament();
         
+        ValidationException excessao = new ValidationException("Erro de Validacao");
+        
         obj.setId(Utils.tryParseToInt(txtId.getText()));
+        //VIDEO 285 - testando se o label de nome eh vazio, se for uma excessao eh lancada, senao os dados sao inseridos
+        if(txtNome.getText()== null || txtNome.getText().trim().equals("")){
+            excessao.addError("Nome", "* O campo nao pode ser vazio"); // adicionando um erro
+        }
         obj.setName(txtNome.getText());
         
+        if(excessao.getErros().size() > 0){ // se houver alguma erro na escessao personalizada, a esxcessao sera lancada, "quebrando o sistema"
+            throw excessao;
+        }
+
         return obj;
+    }
+    //metodo que preenche os erros no label de erros (lblErroNome)
+    public void setErrorMessages(Map<String, String> erros){
+        Set<String> fields = erros.keySet();
+        if(fields.contains("Nome")){
+           lblErroNome.setText(erros.get("Nome")); //pegando a mensagem do Nome da excessao e setando no label
+        }
     }
     
     @FXML
