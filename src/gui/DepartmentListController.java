@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,6 +24,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -69,6 +71,9 @@ public class DepartmentListController implements Initializable, DataChangeListen
     private TableColumn<Departament, String> tblColunaNome;
     
     @FXML
+    TableColumn<Departament, Departament> tableColumnEDIT;
+    
+    @FXML
     private Button btNew;
     
     private ObservableList<Departament> obsList;//responsavel por associar o objeto no TableView (tblVwDpto)
@@ -93,6 +98,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
         List<Departament> lista = service.findAll();
         obsList = FXCollections.observableArrayList(lista); //carregando a lista dentro do ObservableList responsavel por carregar o TableView
         tblVwDpto.setItems(obsList); // carregando os itens na tableView e mostrar na tela
+        initEditButtons(); //VIDEO 286 - acrescentar um novo botao em cada linha da tabela
     }
     
     //metodo para carregar a janela do frmulario para preencher um novo departamento
@@ -121,6 +127,23 @@ public class DepartmentListController implements Initializable, DataChangeListen
         }
     }
 
-    
+    private void initEditButtons() {
+        tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        tableColumnEDIT.setCellFactory(param -> new TableCell<Departament, Departament>() {
+            private final Button button = new Button("editar");
+            
+            @Override
+            protected void updateItem(Departament obj, boolean empty) {
+                super.updateItem(obj, empty);
+                if (obj == null) {
+                    setGraphic(null);
+                    return;
+                }
+            setGraphic(button);
+            button.setOnAction( //quando o botao for clicado, abrira o formulario de edicao para alterar os dados do departamento
+                event -> createDialogForm(obj, "/gui/DepartmentForm.fxml",Utils.currentStage(event)));
+            }
+        });
+    } 
     
 }
