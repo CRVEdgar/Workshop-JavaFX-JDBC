@@ -9,6 +9,7 @@ import gui.util.Alerts;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXML;
@@ -49,16 +50,19 @@ public class MainViewController implements Initializable {
     
     @FXML
     public void onMenuItemDepartmentAction(){
-        loadView2("/gui/DepartmentList.fxml");
+        loadView("/gui/DepartmentList.fxml", (DepartmentListController controller) -> {
+            controller.setDepartmentService(new DepartmentService());
+            controller.updateTableView();
+        });
     }
     
     @FXML
     public void onMenuItemAboutAction(){
-        loadView("/gui/About.fxml");
+        loadView("/gui/About.fxml", x -> {} );
     }
     
-
-    private synchronized void loadView(String absoluteName){
+                                                                //VIDEO 277 
+    private synchronized <T> void loadView(String absoluteName, Consumer<T> acaoDeInicializacao){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
             VBox newVbox = loader.load(); //adicionando um vbox[o vbox loader passado por parametro] à tela MainView
@@ -72,13 +76,16 @@ public class MainViewController implements Initializable {
             mainVbox.getChildren().add(mainMenu); //adicioando novamente o menuBar
             mainVbox.getChildren().addAll(newVbox.getChildren()); //adicionando no vbox os filhos do newVbox
             
+            //As linhas abaixo sao responsaveis por carregar a funcao(generica) parametrizada [VIDEO 278]
+            T controller = loader.getController();
+            acaoDeInicializacao.accept(controller);
             
         } catch (IOException ex) {
             Alerts.showAlert("IO Exception", "Erro ao carregar View[About]", ex.getMessage(), AlertType.ERROR);
         }
     }
     
-    //VIDEO 277
+    
     private synchronized void loadView2(String absoluteName){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
