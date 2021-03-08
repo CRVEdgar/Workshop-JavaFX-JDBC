@@ -75,7 +75,7 @@ public class DepartmentListController implements Initializable {
         createDialogForm(obj, "/gui/DepartmentForm.fxml", parentStage);
     }
     
-    public void setDepartmentService(DepartmentService service){
+    public void setDepartmentService(DepartmentService service){ //chamado [injetado] na MainViewController
         this.service = service;
     }
     
@@ -98,6 +98,7 @@ public class DepartmentListController implements Initializable {
             //injentando o departamento [passado no parametro] no controlador
             DepartmentFormController controller = loader.getController(); //capturando a View
             controller.setDepartment(obj);//setando o Departamento no controlador
+            controller.setDepartmentService(new DepartmentService()); //injetando um servico 
             controller.updateFormData();
             
             Stage dialogStage = new Stage();

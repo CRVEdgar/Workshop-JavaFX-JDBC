@@ -19,5 +19,15 @@ public class Utils {
     public static Stage currentStage(ActionEvent evento){ 
         return (Stage) ((Node) evento.getSource()).getScene().getWindow();
     }
+    
+    //metodo que converte uma string em inteiro
+    public static Integer tryParseToInt(String str){
+        try{
+            return Integer.parseInt(str);
+        }catch(NumberFormatException e){
+            return null;
+        }
+        
+    }
 
 }
