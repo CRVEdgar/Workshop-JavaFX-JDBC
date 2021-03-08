@@ -6,15 +6,17 @@
 package gui;
 
 import db.DbException;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -36,6 +38,8 @@ public class DepartmentFormController implements Initializable {
     
     private Departament entidade;
     private DepartmentService service;
+    
+    private List<DataChangeListener> dataChangeListeners = new ArrayList<>(); //VIDEO 284
 
     @FXML
     private TextField txtId;
@@ -58,6 +62,16 @@ public class DepartmentFormController implements Initializable {
         this.service = service;
     }
     
+    public void inscreverDataChangeListener(DataChangeListener listener){
+        dataChangeListeners.add(listener);
+    }
+    
+    private void notifyDataChangeListeners() { //VIDEO 284
+        for(DataChangeListener listener : dataChangeListeners){
+            listener.onDataChanger(); // chamando[notificando com] o metodo -> DepartmentListController -> onDataChanger
+        }
+    }
+    
     //Salvando no banco de dados apos click[VIDEO 283]
     @FXML
     public void onBtSaveAction(ActionEvent evento){
@@ -70,12 +84,12 @@ public class DepartmentFormController implements Initializable {
         try{
             entidade = getFormData();
             service.saveOrUpdate(entidade);
+            notifyDataChangeListeners(); //VIDEO 284 - notifica quando ocorrer uma alteracao
             Utils.currentStage(evento).close();//pega a referencia da janela atual e fecha
             Alerts.showAlert("Adicionando Departamento", null, "Departamento Adicionado com sucesso", AlertType.INFORMATION);
         }catch(DbException e){
             Alerts.showAlert("Erro ao salvar no Banco de dados", null, e.getMessage(), AlertType.ERROR);
         }
-        
     }
     private Departament getFormData(){ //metodo que captura o que eh digitado nos campos do formulario da view[departmentForm]
         Departament obj = new Departament();
@@ -87,10 +101,10 @@ public class DepartmentFormController implements Initializable {
     }
     
     @FXML
-    public void onBtCancelAction(){
-        System.out.println("onBtCancelAction");
+    public void onBtCancelAction(ActionEvent evento){
+        Utils.currentStage(evento).close();//pega a referencia da janela atual e fecha
     }
-    
+
     private void initializeNodes(){
         Constraints.setTextFieldInteger(txtId);
         Constraints.setTextFieldMaxLength(txtNome, 30);
@@ -105,4 +119,6 @@ public class DepartmentFormController implements Initializable {
         txtId.setText(String.valueOf(entidade.getId()));
         txtNome.setText(entidade.getName());
     }
+
+    
 }

@@ -6,6 +6,7 @@
 package gui;
 
 import aplicacao.FXMain;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
 import java.io.IOException;
@@ -36,12 +37,17 @@ import model.services.DepartmentService;
  *
  * @author Edgar
  */
-public class DepartmentListController implements Initializable {
+public class DepartmentListController implements Initializable, DataChangeListener {
     private DepartmentService service;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         inicializaNodes();
+    }
+    
+    @Override
+    public void onDataChanger() { //metodo responsavel por atualizar a tabela quando o mesmo for chamado em outra classe; : DepartmentFormController -> inscreverDataChangeListener -> notifyDataChangeListeners(e aqui ele chama com listener.onDataChanger();
+        updateTableView();
     }
     
     private void inicializaNodes() {//iniciar o comportamento das colunas de a cordo com os atributos do objeto Department
@@ -98,7 +104,8 @@ public class DepartmentListController implements Initializable {
             //injentando o departamento [passado no parametro] no controlador
             DepartmentFormController controller = loader.getController(); //capturando a View
             controller.setDepartment(obj);//setando o Departamento no controlador
-            controller.setDepartmentService(new DepartmentService()); //injetando um servico 
+            controller.setDepartmentService(new DepartmentService()); //injetando um servico
+            controller.inscreverDataChangeListener(this); //VIDEO 284 - se increvendo na fila de eventos, quando o vento for disparado sera executado o metodo de atualizacao da tabela 
             controller.updateFormData();
             
             Stage dialogStage = new Stage();
@@ -113,5 +120,7 @@ public class DepartmentListController implements Initializable {
             Alerts.showAlert("IO Exception", "Erro ao carregar View", e.getMessage(), AlertType.ERROR);
         }
     }
+
+    
     
 }
