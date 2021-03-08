@@ -18,7 +18,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import model.entities.Department;
+import model.entities.Departament;
 import model.services.DepartmentService;
 
 /**
@@ -44,18 +44,18 @@ public class DepartmentListController implements Initializable {
     }
     
     @FXML
-    private TableView<Department> tblVwDpto;
+    private TableView<Departament> tblVwDpto;
     
     @FXML
-    private TableColumn<Department, Integer> tblColunaId;
+    private TableColumn<Departament, Integer> tblColunaId;
     
     @FXML
-    private TableColumn<Department, String> tblColunaNome;
+    private TableColumn<Departament, String> tblColunaNome;
     
     @FXML
     private Button btNew;
     
-    private ObservableList<Department> obsList;//responsavel por associar o objeto no TableView (tblVwDpto)
+    private ObservableList<Departament> obsList;//responsavel por associar o objeto no TableView (tblVwDpto)
     
     @FXML
     private void onBtNewAction(){
@@ -71,7 +71,7 @@ public class DepartmentListController implements Initializable {
         if(service == null){
             throw new IllegalStateException("Servico nulo - o metodo [setDepartmentService] nao foi setado");
         }
-        List<Department> lista = service.findAll();
+        List<Departament> lista = service.findAll();
         obsList = FXCollections.observableArrayList(lista); //carregando a lista dentro do ObservableList responsavel por carregar o TableView
         tblVwDpto.setItems(obsList); // carregando os itens na tableView e mostrar na tela
     }
