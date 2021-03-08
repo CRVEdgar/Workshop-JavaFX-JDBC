@@ -6,17 +6,27 @@
 package gui;
 
 import aplicacao.FXMain;
+import gui.util.Alerts;
+import gui.util.Utils;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Departament;
 import model.services.DepartmentService;
@@ -58,8 +68,9 @@ public class DepartmentListController implements Initializable {
     private ObservableList<Departament> obsList;//responsavel por associar o objeto no TableView (tblVwDpto)
     
     @FXML
-    private void onBtNewAction(){
-        System.out.println("onbtnewAction");
+    private void onBtNewAction(ActionEvent evento){
+        Stage parentStage = Utils.currentStage(evento);//chama o metod da classe Utils que eh responsavel por devolver o Stage onde ocorre o evento
+        createDialogForm("/gui/DepartmentForm.fxml", parentStage);
     }
     
     public void setDepartmentService(DepartmentService service){
@@ -74,6 +85,25 @@ public class DepartmentListController implements Initializable {
         List<Departament> lista = service.findAll();
         obsList = FXCollections.observableArrayList(lista); //carregando a lista dentro do ObservableList responsavel por carregar o TableView
         tblVwDpto.setItems(obsList); // carregando os itens na tableView e mostrar na tela
+    }
+    
+    //metodo para carregar a janela do frmulario para preencher um novo departamento
+    public void createDialogForm(String absoluteName, Stage parentStage){ //parametro faz referencia ao nome da View a janela que criou a janela de dialogo
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+            Pane pane = loader.load(); //painel para carregar a view
+            
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Entrada de Dados do Departamento");
+            dialogStage.setScene(new Scene(pane));
+            dialogStage.setResizable(false);
+            dialogStage.initOwner(parentStage);// Stage pai da janela de dialogo [ a que eh recebida como parametro]
+            dialogStage.initModality(Modality.WINDOW_MODAL); //janela modal, trava as demais janelas, enquanto a janela de dialogo[dialogStage] nao for fechada, as demais janelas nao vao poder ser utilizadas[bloqueio na janela de dialogo]
+            dialogStage.showAndWait();
+            
+        }catch(IOException e){
+            Alerts.showAlert("IO Exception", "Erro ao carregar View", e.getMessage(), AlertType.ERROR);
+        }
     }
     
 }
