@@ -7,6 +7,7 @@ package model.dao.implement;
 
 import db.DB;
 import db.DbException;
+import db.DbIntegrityException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -98,7 +99,7 @@ public class DepartmentDaoJDBC implements DepartmentDao{
             }
             
         }catch(SQLException e){
-            throw new DbException(e.getMessage());         
+            throw new DbIntegrityException(e.getMessage());         
         }finally{
             DB.closeStatement(st);
         }

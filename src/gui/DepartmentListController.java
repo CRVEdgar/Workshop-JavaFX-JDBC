@@ -6,12 +6,15 @@
 package gui;
 
 import aplicacao.FXMain;
+import db.DbException;
+import db.DbIntegrityException;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -24,6 +27,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -74,6 +78,9 @@ public class DepartmentListController implements Initializable, DataChangeListen
     TableColumn<Departament, Departament> tableColumnEDIT;
     
     @FXML
+    TableColumn<Departament, Departament> tableColumnREMOVE;
+    
+    @FXML
     private Button btNew;
     
     private ObservableList<Departament> obsList;//responsavel por associar o objeto no TableView (tblVwDpto)
@@ -98,7 +105,8 @@ public class DepartmentListController implements Initializable, DataChangeListen
         List<Departament> lista = service.findAll();
         obsList = FXCollections.observableArrayList(lista); //carregando a lista dentro do ObservableList responsavel por carregar o TableView
         tblVwDpto.setItems(obsList); // carregando os itens na tableView e mostrar na tela
-        initEditButtons(); //VIDEO 286 - acrescentar um novo botao em cada linha da tabela
+        initEditButtons(); //VIDEO 286 - acrescentar um novo botao em cada linha da tabela para EDITAR
+        initRemoveButtons();  //VIDEO 287 - acrescentar um novo botao em cada linha da tabela para APAGAR 
     }
     
     //metodo para carregar a janela do frmulario para preencher um novo departamento
@@ -144,6 +152,40 @@ public class DepartmentListController implements Initializable, DataChangeListen
                 event -> createDialogForm(obj, "/gui/DepartmentForm.fxml",Utils.currentStage(event)));
             }
         });
-    } 
+    }
     
+    private void initRemoveButtons() {
+        tableColumnREMOVE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        tableColumnREMOVE.setCellFactory(param -> new TableCell<Departament, Departament>() {
+            private final Button button = new Button("remover");
+
+            @Override
+            protected void updateItem(Departament obj, boolean empty) {
+                super.updateItem(obj, empty);
+                if (obj == null) {
+                    setGraphic(null);
+                    return;
+                }
+                setGraphic(button); //chama o metodo para remover a tupla caso o botao seja cliclado
+                button.setOnAction(event -> removeEntity(obj)); //chama o metodo que cria a caixa de dialogo pra confirmacar DEL
+            }
+        });
+    }
+    //metodo para confirmar o delete
+    private void removeEntity(Departament obj) {
+        Optional<ButtonType> result = Alerts.showConfirmation("Deletar Registro", "Deseja realmente apagar o registro?");
+        
+        if(result.get() == ButtonType.OK){
+            if (service == null){
+                throw new IllegalStateException("Servico Nulo - o metodo [setDepartmentService] nao foi setado");
+            }
+            try{
+                service.remove(obj); //remove
+                updateTableView(); // atualiza tabela
+            }catch(DbIntegrityException e){
+                Alerts.showAlert("Erro de Remocao", null, e.getMessage(), AlertType.ERROR);
+            }
+            
+        }
+    }
 }
