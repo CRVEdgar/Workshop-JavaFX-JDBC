@@ -11,8 +11,11 @@ import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -21,6 +24,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Departament;
@@ -48,14 +52,34 @@ public class SellerFormController implements Initializable {
     private TextField txtId;
     @FXML
     private TextField txtNome;
+    @FXML
+    private TextField txtEmail;
+    @FXML
+    private DatePicker dpBirthDate;
+    @FXML
+    private TextField txtBaseSalary;
     
     @FXML
     private Label lblErroNome;
+    @FXML
+    private Label lblErroBirthDate;
+    @FXML
+    private Label lblErroEmail;
+    @FXML
+    private Label lblErroBaseSalary;
     
     @FXML
     private Button btSave;
     @FXML
     private Button btCancel;
+    
+    private void initializeNodes(){
+        Constraints.setTextFieldInteger(txtId);
+        Constraints.setTextFieldMaxLength(txtNome, 70);
+        Constraints.setTextFieldDouble(txtBaseSalary);
+        Constraints.setTextFieldMaxLength(txtEmail, 40);
+        Utils.formatDatePicker(dpBirthDate, "dd/MM/yyyy");
+    }
     
     public void setSeller(Seller entidade){
         this.entidade = entidade;
@@ -127,11 +151,6 @@ public class SellerFormController implements Initializable {
     public void onBtCancelAction(ActionEvent evento){
         Utils.currentStage(evento).close();//pega a referencia da janela atual e fecha
     }
-
-    private void initializeNodes(){
-        Constraints.setTextFieldInteger(txtId);
-        Constraints.setTextFieldMaxLength(txtNome, 30);
-    }
     
     public void updateFormData(){
         
@@ -141,5 +160,11 @@ public class SellerFormController implements Initializable {
         }
         txtId.setText(String.valueOf(entidade.getId()));
         txtNome.setText(entidade.getName());
+        txtEmail.setText(entidade.getEmail());
+        Locale.setDefault(Locale.US);
+        txtBaseSalary.setText(String.format("%.2f",entidade.getBasesalary()));
+        if(entidade.getBirthdate()!=null){//so converte se a data for diferente de nulo, ou seja quando clicar no botao "CADASTRAR NOVO VENDEDOR" a conversao nao sera feita // se clicar em editar(campo ao lado da tupla) a conversao sera feita
+            dpBirthDate.setValue(LocalDate.ofInstant(entidade.getBirthdate().toInstant(), ZoneId.systemDefault()));
+        }                                                                            //pega o fusorario do computador da pessoa que estiver utilizando o sistema
     }
 }
