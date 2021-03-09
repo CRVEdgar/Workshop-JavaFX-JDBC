@@ -10,6 +10,7 @@ import db.DbIntegrityException;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
+import java.io.IOException;
 //import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
@@ -21,9 +22,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-//import javafx.fxml.FXMLLoader;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-//import javafx.scene.Scene;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -31,8 +32,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-//import javafx.scene.layout.Pane;
-//import javafx.stage.Modality;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 //import model.entities.Departament;
 import model.entities.Seller;
@@ -52,7 +53,7 @@ public class SellerListController implements Initializable, DataChangeListener{
     }
     
     @Override
-    public void onDataChanger() { //metodo responsavel por atualizar a tabela quando o mesmo for chamado em outra classe; : DepartmentFormController -> inscreverDataChangeListener -> notifyDataChangeListeners(e aqui ele chama com listener.onDataChanger();
+    public void onDataChanger() { //metodo responsavel por atualizar a tabela quando o mesmo for chamado em outra classe; : SellerFormController -> inscreverDataChangeListener -> notifyDataChangeListeners(e aqui ele chama com listener.onDataChanger();
         updateTableView();
     }
     
@@ -108,7 +109,7 @@ public class SellerListController implements Initializable, DataChangeListener{
         Stage parentStage = Utils.currentStage(evento);//chama o metod da classe Utils que eh responsavel por devolver o Stage onde ocorre o evento
         Seller obj = new Seller();
         
-        createDialogForm(obj, "/gui/DepartmentForm.fxml", parentStage);
+        createDialogForm(obj, "/gui/SellerForm.fxml", parentStage);
     }
     
     public void setSellerService(SellerService service){ //chamado [injetado] na MainViewController
@@ -127,21 +128,21 @@ public class SellerListController implements Initializable, DataChangeListener{
         initRemoveButtons();  //VIDEO 287 - acrescentar um novo botao em cada linha da tabela para APAGAR 
     }
     
-    //metodo para carregar a janela do frmulario para preencher um novo departamento
+    //metodo para carregar a janela do formulario para preencher um novo vendedor
     public void createDialogForm(Seller obj, String absoluteName, Stage parentStage){ //parametro faz referencia ao nome da View a janela que criou a janela de dialogo
-       /* try{
+        try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
             Pane pane = loader.load(); //painel para carregar a view
             
-            //injentando o departamento [passado no parametro] no controlador
-            DepartmentFormController controller = loader.getController(); //capturando a View
-            controller.setDepartment(obj);//setando o Departamento no controlador
-            controller.setDepartmentService(new DepartmentService()); //injetando um servico
+            //injentando o vendedor [passado no parametro] no controlador
+            SellerFormController controller = loader.getController(); //capturando a View
+            controller.setSeller(obj);//setando o vendedor no controlador
+            controller.setSellerService(new SellerService()); //injetando um servico
             controller.inscreverDataChangeListener(this); //VIDEO 284 - se increvendo na fila de eventos, quando o vento for disparado sera executado o metodo de atualizacao da tabela 
             controller.updateFormData();
             
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Entrada de Dados do Departamento");
+            dialogStage.setTitle("Entrada de Dados do Vendedor");
             dialogStage.setScene(new Scene(pane));
             dialogStage.setResizable(false);
             dialogStage.initOwner(parentStage);// Stage pai da janela de dialogo [ a que eh recebida como parametro]
@@ -150,7 +151,7 @@ public class SellerListController implements Initializable, DataChangeListener{
             
         }catch(IOException e){
             Alerts.showAlert("IO Exception", "Erro ao carregar View", e.getMessage(), Alert.AlertType.ERROR);
-        }*/
+        }
     }
 
     private void initEditButtons() {
@@ -166,8 +167,8 @@ public class SellerListController implements Initializable, DataChangeListener{
                     return;
                 }
             setGraphic(button);
-            button.setOnAction( //quando o botao for clicado, abrira o formulario de edicao para alterar os dados do departamento
-                event -> createDialogForm(obj, "/gui/DepartmentForm.fxml",Utils.currentStage(event)));
+            button.setOnAction( //quando o botao for clicado, abrira o formulario de edicao para alterar os dados do vendedor
+                event -> createDialogForm(obj, "/gui/SellerForm.fxml",Utils.currentStage(event)));
             }
         });
     }
