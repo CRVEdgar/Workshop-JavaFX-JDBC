@@ -37,7 +37,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 //import model.entities.Departament;
 import model.entities.Seller;
-//import model.services.DepartmentService;
+import model.services.DepartmentService;
 import model.services.SellerService;
 
 /**
@@ -137,7 +137,8 @@ public class SellerListController implements Initializable, DataChangeListener{
             //injentando o vendedor [passado no parametro] no controlador
             SellerFormController controller = loader.getController(); //capturando a View
             controller.setSeller(obj);//setando o vendedor no controlador
-            controller.setSellerService(new SellerService()); //injetando um servico
+            controller.setServices(new SellerService(), new DepartmentService() ); //injetando os servicos
+            controller.loadAssociatedObjects(); //associando comboBox com os departamentos do BD
             controller.inscreverDataChangeListener(this); //VIDEO 284 - se increvendo na fila de eventos, quando o vento for disparado sera executado o metodo de atualizacao da tabela 
             controller.updateFormData();
             
@@ -150,6 +151,7 @@ public class SellerListController implements Initializable, DataChangeListener{
             dialogStage.showAndWait();
             
         }catch(IOException e){
+            e.printStackTrace();
             Alerts.showAlert("IO Exception", "Erro ao carregar View", e.getMessage(), Alert.AlertType.ERROR);
         }
     }
