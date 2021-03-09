@@ -11,9 +11,11 @@ import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -140,25 +142,67 @@ public class SellerFormController implements Initializable {
         
         ValidationException excessao = new ValidationException("Erro de Validacao");
         
-        obj.setId(Utils.tryParseToInt(txtId.getText()));
+        obj.setId(Utils.tryParseToInt(txtId.getText()));//converte o que foi digitado pata int [gui.Utilis->tryParseToInt]
         //VIDEO 285 - testando se o label de nome eh vazio, se for uma excessao eh lancada, senao os dados sao inseridos
         if(txtNome.getText()== null || txtNome.getText().trim().equals("")){
-            excessao.addError("Nome", "* O campo nao pode ser vazio"); // adicionando um erro
+            excessao.addError("Nome Excessao", "* O campo nao pode ser vazio"); // adicionando um erro
         }
-        obj.setName(txtNome.getText());
+        obj.setName(txtNome.getText()); //adiciona no objeto o que foi digitado no label
+        
+        if(txtEmail.getText()== null || txtEmail.getText().trim().equals("")){
+            excessao.addError("Email Excessao", "* O campo nao pode ser vazio"); // adicionando um erro
+        }
+        obj.setEmail(txtEmail.getText());//adiciona no objeto o que foi digitado no label
+        
+        if(dpBirthDate.getValue() == null){
+            excessao.addError("BirthDate Excessao", "* O campo nao pode ser vazio"); // adicionando um erro
+        }else{
+            Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+            obj.setBirthdate(Date.from(instant));  
+        }
+            
+        if(txtBaseSalary.getText()== null || txtBaseSalary.getText().trim().equals("")){
+            excessao.addError("Salario Base Excessao", "* O campo nao pode ser vazio"); // adicionando um erro
+        }
+        obj.setBasesalary(Utils.tryParseToDouble(txtBaseSalary.getText())); //converte o que foi digitado pata double [gui.Utilis->tryParseToInt]
+        //adiciona no objeto o que foi digitado no label
+        
+        obj.setDepartment(comboBoxDepartament.getValue()); //pega o que foi selecionado no comboBox e insere na entidade vendedor
         
         if(excessao.getErros().size() > 0){ // se houver alguma erro na escessao personalizada, a esxcessao sera lancada, "quebrando o sistema"
             throw excessao;
         }
-
+        //se nao houver execesao, o objeto eh retonado;
         return obj;
     }
-    //metodo que preenche os erros no label de erros (lblErroNome)
+    //metodo que preenche os erros no label de erros (lblErros) com a mesnagem da excecao contida em getFormData -> excessao.addError
     public void setErrorMessages(Map<String, String> erros){
         Set<String> fields = erros.keySet();
-        if(fields.contains("Nome")){
-           lblErroNome.setText(erros.get("Nome")); //pegando a mensagem do Nome da excessao e setando no label
+        //testando se houve erro com os nomes nos parametros dos blocos IF (nome, emial, salario base)
+        if(fields.contains("Nome Excessao")){ //o nome do parametro deve ser igual ao da excessao criada em [getFormData] (excessao.addError)
+           lblErroNome.setText(erros.get("Nome Excessao")); //pegando a mensagem da excessao com titulo "Nome Excessao" e setando no label
+        }else{
+           lblErroNome.setText("");
         }
+        
+        // SUBSTITUIDO PELO BLOCO IF ELSE ACIMA -> lblErroNome.setText(fields.contains("Nome Excessao") ? erros.get("Nome Excessao") : "");
+        lblErroEmail.setText(fields.contains("Email Excessao") ? erros.get("Email Excessao") : "");
+        lblErroBaseSalary.setText(fields.contains("Salario Base Excessao") ? erros.get("Salario Base Excessao") : "");
+        lblErroBirthDate.setText(fields.contains("BirthDate Excessao") ? erros.get("BirthDate Excessao") : "");
+        
+        /* os itens abaixos foram substituidos pela declaracao ternario acima
+        if(fields.contains("Email Excessao")){//o nome do parametro deve ser igual ao da excessao criada em [getFormData] (excessao.addError)
+           lblErroEmail.setText(erros.get("Email Excessao")); //pegando a mensagem da excessao com titulo "Email Excessao" e setando no label
+        }
+        
+        if(fields.contains("Salario Base Excessao")){//o nome do parametro deve ser igual ao da excessao criada em [getFormData] (excessao.addError)
+           lblErroBaseSalary.setText(erros.get("Salario Base Excessao")); //pegando a mensagem da excessao com titulo "Salario Base Excessao" e setando no label
+        }
+        
+        if(fields.contains("BirthDate Excessao")){//o nome do parametro deve ser igual ao da excessao criada em [getFormData] (excessao.addError)
+           lblErroBirthDate.setText(erros.get("BirthDate Excessao")); //pegando a mensagem da excessao com titulo "BirthDate Excessao" e setando no label
+        }
+        */
     }
     
     @FXML

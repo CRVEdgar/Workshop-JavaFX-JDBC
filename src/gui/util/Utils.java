@@ -30,13 +30,21 @@ public class Utils {
     }
     
     //metodo que converte uma string em inteiro
-    public static Integer tryParseToInt(String str){
+    public static Integer tryParseToInt(String str){//tenta converter em inteiro, se der erro, retornara NULL
         try{
             return Integer.parseInt(str);
         }catch(NumberFormatException e){
             return null;
-        }
-        
+        }  
+    }
+    
+    //metodo que converte uma string em Double
+    public static Double tryParseToDouble(String str){//tenta converter em double, se der erro, retornara NULL
+        try{
+            return Double.parseDouble(str);
+        }catch(NumberFormatException e){
+            return null;
+        }  
     }
     
     public static <T> void formatTableColumnDate(TableColumn<T, Date> tableColumn, String format) {
