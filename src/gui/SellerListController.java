@@ -12,6 +12,7 @@ import gui.util.Alerts;
 import gui.util.Utils;
 //import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -55,9 +56,15 @@ public class SellerListController implements Initializable, DataChangeListener{
         updateTableView();
     }
     
-    private void inicializaNodes() {//iniciar o comportamento das colunas de a cordo com os atributos do objeto Department
-        tblColunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
+    //Classe que inicializa a tabela
+    private void inicializaNodes() {//iniciar o comportamento das colunas de a cordo com os atributos do objeto Seller
+        tblColunaId.setCellValueFactory(new PropertyValueFactory<>("id")); //no parametro deve inserir o mesmo nome do atributo da classe
         tblColunaNome.setCellValueFactory(new PropertyValueFactory<>("name"));
+        tblColunaEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        tblColunaBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthdate"));
+        Utils.formatTableColumnDate(tblColunaBirthDate, "dd/MM/yyyy");
+        tblColunaBaseSalary.setCellValueFactory(new PropertyValueFactory<>("basesalary"));
+        Utils.formatTableColumnDouble(tblColunaBaseSalary, 2);
         
         //acompanhar [redimencionar] largura e altura da janela
         Stage stage = (Stage) FXMain.getMainScene().getWindow();
@@ -72,6 +79,18 @@ public class SellerListController implements Initializable, DataChangeListener{
     
     @FXML
     private TableColumn<Seller, String> tblColunaNome;
+    
+    @FXML
+    private TableColumn<Seller, String> tblColunaEmail;
+    
+    @FXML
+    private TableColumn<Seller, Date> tblColunaBirthDate;
+    
+    @FXML
+    private TableColumn<Seller, Double> tblColunaBaseSalary;
+    
+    /*@FXML
+    private TableColumn<Seller, Integer> tblColunaDepartmentId;*/
     
     @FXML
     TableColumn<Seller, Seller> tableColumnEDIT;
@@ -93,11 +112,11 @@ public class SellerListController implements Initializable, DataChangeListener{
     }
     
     public void setSellerService(SellerService service){ //chamado [injetado] na MainViewController
-        this.service = service;
+        this.service = service; // aqui eh importante porque injeta o servico, nesse caso o CRUD
     }
     
     //VIDEO 277
-    public void updateTableView(){ //metodo que acessa o servico, carrega os departamento e insere na ObservableList
+    public void updateTableView(){ //metodo que acessa o servico, CARREGA OS VENDEDORES DO BANCO e insere na ObservableList
         if(service == null){
             throw new IllegalStateException("Servico nulo - o metodo [setSellerService] nao foi setado");
         }

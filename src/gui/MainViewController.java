@@ -47,7 +47,7 @@ public class MainViewController implements Initializable {
     @FXML
     public void onMenuItemSellerAction(){
         loadView("/gui/SellerList.fxml", (SellerListController controller) -> {
-            controller.setSellerService(new SellerService());
+            controller.setSellerService(new SellerService()); //injetando o sevico, neste caso com as classes de conexao com o banco
             controller.updateTableView();
         });
     }
